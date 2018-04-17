@@ -37,7 +37,7 @@ class TournamentCompetitors extends Component{
         }
         return (<div className="container">
             <div>{this.renderListofCompetitors()}</div>
-            <div>On Blur COmpetitor's Name will be changed</div>
+            <div>On Blur Competitor's Name will be changed</div>
             <Link to="/" className="btn-floating btn-large red right">
                 <i className="material-icons">arrow_back</i>
             </Link>
