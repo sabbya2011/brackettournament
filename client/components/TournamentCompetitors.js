@@ -2,6 +2,7 @@ import React , {Component } from 'react';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
 import {Link} from 'react-router';
+import { changeCompetitorName , queryToGetCompleteTournamentData } from '../schema/schema';
 
 class TournamentCompetitors extends Component{
 
@@ -11,10 +12,14 @@ class TournamentCompetitors extends Component{
             variables:{
                 id:competitor.id,
                 name
-            }
+            },
+            refetchQueries:[{query:queryToGetCompleteTournamentData}]
         }).then(
             ()=>{
                 console.log("Successfully updated");
+            },
+            (err)=>{
+                console.log(err);
             }
         )
     }
@@ -40,24 +45,7 @@ class TournamentCompetitors extends Component{
     }
 }
 
-const changeCompetitorName = gql`
-    mutation changeCompetitorName ($id : ID,$name: String){
-        changeCompetitorName(id: $id,name: $name){
-            name
-        }
-    }
-`;
-const queryToGetCompleteTournamentData = gql`
-{
-    competitors{
-      id,
-      name,
-      competeAgainst,
-      round,
-      active,
-      primaryIndex
-    }
-}`;
+
 const TournamentQueryAndMutationCollection =  compose(
     graphql(queryToGetCompleteTournamentData),
     graphql(changeCompetitorName, {

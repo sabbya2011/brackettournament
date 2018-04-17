@@ -21,7 +21,11 @@ CompetitorSchema.statics.changeCompetitorDetails = function(id, competitorObj) {
       if(competitorObj["active"])
         competitor.active = competitorObj.active;
       return competitor.save()
-        .then((competitor) => competitor);
+        .then((competitor) => competitor,
+      );
+    },
+    (err)=>{
+        console.log(err);
     });
 }
 
@@ -33,6 +37,9 @@ CompetitorSchema.statics.changeRound = function(id, round) {
       competitor.round = round;
       return competitor.save()
         .then((competitor) => competitor);
+    },
+    (err)=>{
+        console.log(err);
     });
 }
 
@@ -42,6 +49,9 @@ CompetitorSchema.statics.changeStatus = function(id, active) {
       competitor.active = active;
       return competitor.save()
         .then((competitor) => competitor);
+    },
+    (err)=>{
+        console.log(err);
     });
 }
 
@@ -51,6 +61,9 @@ CompetitorSchema.statics.changeName = function(id, name) {
       competitor.name = name;
       return competitor.save()
         .then((competitor) => competitor);
+    },
+    (err)=>{
+        console.log(err);
     });
 }
 
@@ -60,6 +73,9 @@ CompetitorSchema.statics.changeCompeteAgainst = function(id, competeAgainst) {
       competitor.competeAgainst = competeAgainst;
       return competitor.save()
         .then((competitor) => competitor);
+    },
+    (err)=>{
+        console.log(err);
     });
 }
 

@@ -1,7 +1,12 @@
 import React , {Component } from 'react';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
-
+import {
+    queryToGetCompleteTournamentData,
+    resetTournament,
+    changeCompetitorRound,
+    changeCompetitorStatus,
+    changeCompeteAgainst } from '../schema/schema';
 import {Link} from 'react-router';
 import '../style/style.css';
 
@@ -111,10 +116,16 @@ class TournamentTree extends Component{
                 this.revertBackAlreadyModifiedCompetitor(data,competeAgainstInfo)
                     .then(()=>{
                         this.rerenderUIComponents();
+                    },
+                    (err)=>{
+                        console.log(err);
                     })
             }else{
                 this.rerenderUIComponents();
             }
+        },
+        (err)=>{
+            console.log(err);
         });
          
     }
@@ -123,6 +134,9 @@ class TournamentTree extends Component{
         this.props.data.refetch()
             .then(()=>{
                 this.renderTournamentList();
+            },
+            (err)=>{
+                console.log(err);
             });
     }
 
@@ -228,6 +242,9 @@ class TournamentTree extends Component{
         }).then(
             ()=>{
                 this.rerenderUIComponents();
+            },
+            (err)=>{
+                console.log(err);
             }
         )
      }
@@ -247,52 +264,7 @@ class TournamentTree extends Component{
     }
 }
 
-const queryToGetCompleteTournamentData = gql`
-{
-    competitors{
-      id,
-      name,
-      competeAgainst,
-      round,
-      active,
-      primaryIndex
-    }
-}`;
 
-const resetTournament = gql`
-    mutation resetCompetition ($competitors : [CompetitorInputType]){
-        resetCompetition(competitors: $competitors)
-    }
-`;
-
-const changeCompetitorRound = gql`
-    mutation changeCompetitorRound ($id : ID, $round :Int){
-        changeCompetitorRound(id: $id, round: $round){
-            round
-        }
-    }
-`;
-const changeCompetitorStatus = gql`
-    mutation changeCompetitorStatus ($id : ID,$active: Boolean){
-        changeCompetitorStatus(id: $id,active: $active){
-            active
-        }
-    }
-`;
-const changeCompetitorName = gql`
-    mutation changeCompetitorName ($id : ID,$name: String){
-        changeCompetitorName(id: $id,competeAgainst: $name){
-            name
-        }
-    }
-`;
-const changeCompeteAgainst = gql`
-    mutation changeCompeteAgainst ($id : ID,$competeAgainst: String){
-        changeCompeteAgainst(id: $id,competeAgainst: $competeAgainst){
-            competeAgainst
-        }
-    }
-`;
 
 const TournamentQueryAndMutationCollection =  compose(
     graphql(queryToGetCompleteTournamentData),
@@ -304,9 +276,6 @@ const TournamentQueryAndMutationCollection =  compose(
     }),
     graphql(changeCompetitorStatus, {
         name: 'changeCompetitorStatus'
-    }),
-    graphql(changeCompetitorName, {
-        name : 'changeCompetitorName'
     }),
     graphql(changeCompeteAgainst, {
         name: 'changeCompeteAgainst'
