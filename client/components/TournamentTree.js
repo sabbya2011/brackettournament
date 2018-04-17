@@ -9,6 +9,7 @@ import {
     changeCompeteAgainst } from '../schema/schema';
 import {Link} from 'react-router';
 import '../style/style.css';
+import debounce from 'debounce';
 
 class TournamentTree extends Component{
     constructor(props){
@@ -79,13 +80,18 @@ class TournamentTree extends Component{
         });
         
         const newCompetitor = this.getNewCompetitor(updatedRound,columnIndex,itemIndex);
-        
-        if(data.competeAgainst=="" || ((Math.abs(competeAgainstInfo.round-data.round)==1)&&(competeAgainstInfo.competeAgainst!=""))
-            || (Math.abs(competeAgainstInfo.round-data.round)>1) || (columnIndex<data.round)){
-            return;
-        }
         const maxRound = this.getMaximumNumberofRounds(this.props.data.competitors);
-        if(maxRound==(columnIndex+1) && data.active==false){
+
+        if(data.competeAgainst==""){
+            if(maxRound==columnIndex){
+                alert("Competition is over");
+            }
+            return;
+        }else if( ((Math.abs(competeAgainstInfo.round-data.round)==1)&&(competeAgainstInfo.competeAgainst!=""))
+            || (Math.abs(competeAgainstInfo.round-data.round)>1) || (columnIndex<data.round)){
+            alert("Challenger Already Selected. Cannot be modified");
+            return;
+        }else if(maxRound==(columnIndex+1) && data.active==false){
             alert("competition is over. Please reset the tournament!")
             return;
         }
@@ -199,7 +205,7 @@ class TournamentTree extends Component{
             const columns = list.map((competitor,itemIndex)=>{
                 return (
                     <div className="column-item" key={competitor.id} style={this.getPosition(columnIndex,itemIndex)}
-                        onClick={(e) => this.competitorClicked(competitor,columnIndex,itemIndex)}>{competitor.name}</div>
+                        onClick={(e) => debounce(this.competitorClicked(competitor,columnIndex,itemIndex) , 1000) }>{competitor.name}</div>
                 )
             })
             return <div className="column" style={this.getTotalHeight(tournamentList[0])} key={columnIndex}>{columns}</div>
@@ -230,7 +236,8 @@ class TournamentTree extends Component{
             let resetCompetitor = this.createDefaultObjectBody(item,item.competeAgainst);
             
             const competeAgainstId = resetCompetitor.competeAgainst;
-            let competeAgainstCompetitor = this.createDefaultObjectBody(this.props.data.competitors.find(item=>item.id==competeAgainstId),resetCompetitor.id);
+            let competeAgainstCompetitor = this.createDefaultObjectBody(
+                this.props.data.competitors.find(item=>item.id==competeAgainstId),resetCompetitor.id);
             resetUsers.push(resetCompetitor);
             resetUsers.push(competeAgainstCompetitor);
         });
