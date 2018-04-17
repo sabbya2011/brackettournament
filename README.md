@@ -1,8 +1,8 @@
-TournamentBracket Project is created to display a knock tournament progress.
+TournamentBracket Project is created to display a knockout tournament progress.
 
 Once a node is clicked it will progress to the next round.
 
-However once a certain competitor's challenger is selected it cannot be undone.
+However once a certain competitor's challenger is selected, it cannot be undone.
 
 Once the winner of the tournament is choosen there is no way to undo it.
 
