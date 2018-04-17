@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React , {Component } from 'react';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
-import {Link, hashHistory} from 'react-router';
+import { graphql, compose } from 'react-apollo';
+import {Link} from 'react-router';
 
-class SongCreate extends Component{
+class TournamentCompetitors extends Component{
 
     constructor(props){
         super(props);
@@ -45,12 +45,29 @@ class SongCreate extends Component{
     }
 }
 
-const mutation = gql`
-    mutation AddSong ($title : String){
-        addSong(title: $title){
-            title
+const changeCompetitorName = gql`
+    mutation changeCompetitorName ($id : ID,$name: String){
+        changeCompetitorName(id: $id,competeAgainst: $name){
+            name
         }
     }
 `;
+const queryToGetCompleteTournamentData = gql`
+{
+    competitors{
+      id,
+      name,
+      competeAgainst,
+      round,
+      active,
+      primaryIndex
+    }
+}`;
+const TournamentQueryAndMutationCollection =  compose(
+    graphql(queryToGetCompleteTournamentData),
+    graphql(changeCompetitorName, {
+        name : 'changeCompetitorName'
+    })
+  )(TournamentCompetitors);
 
-export default graphql(mutation)(SongCreate);
+export default TournamentQueryAndMutationCollection;

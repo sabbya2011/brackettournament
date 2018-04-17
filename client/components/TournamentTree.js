@@ -12,22 +12,16 @@ class TournamentTree extends Component{
 
     }
     
-    getNewCompetitor(updatedRound,columnIndex,itemIndex){
-        
+    getNewCompetitor(updatedRound,columnIndex,itemIndex){ 
         let newItemIndex = Math.floor(itemIndex/2);
-        
         const newColumnIndex = columnIndex+1;
-        
         newItemIndex = newItemIndex%2?newItemIndex-1:newItemIndex+1;
-        
         if(this.tournamentList[newColumnIndex]){
             const newCompetitor = this.tournamentList[newColumnIndex][newItemIndex];
-        
             return newCompetitor?newCompetitor.id:'';
         }else{
             return '';
         }
-        
     }
 
 
@@ -85,7 +79,11 @@ class TournamentTree extends Component{
             || (Math.abs(competeAgainstInfo.round-data.round)>1) || (columnIndex<data.round)){
             return;
         }
-
+        const maxRound = this.getMaximumNumberofRounds(this.props.data.competitors);
+        if(maxRound==(columnIndex+1) && data.active==false){
+            alert("competition is over. Please reset the tournament!")
+            return;
+        }
 
         this.makeCommonOnClickChanges(
             {
@@ -152,7 +150,7 @@ class TournamentTree extends Component{
     }
     populateBracketList(tournamentList){
         tournamentList = this.rearrangeListasPerMatches(tournamentList);
-        let maxRounds = this.getMaximumNumberofRounds(tournamentList);
+        
         let createdBracketList = [];
         for(let i = 0;i<tournamentList.length;i++){
             let competitor = tournamentList[i];
