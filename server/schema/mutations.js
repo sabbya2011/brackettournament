@@ -1,7 +1,7 @@
 const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLBoolean, GraphQLInt } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLBoolean, GraphQLInt, GraphQLList } = graphql;
 const mongoose = require('mongoose');
-const CompetitorType = require('./competitor_type');
+const {CompetitorType, InputCompetitorType} = require('./competitor_type');
 const Competitor = mongoose.model('competitor');
 
 const mutation = new GraphQLObjectType({
@@ -69,6 +69,16 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parentValue, { id, competeAgainst }) {
         return Competitor.changeCompeteAgainst(id, competeAgainst);
+      }
+    },
+    resetCompetition: {
+      type: GraphQLBoolean,
+      args: {
+        competitors: { type: new GraphQLList(InputCompetitorType) }
+      },
+      resolve(parentValue, { competitors }) {
+        console.log(competitors);
+        return Competitor.resetCompetition(competitors);
       }
     },
   }

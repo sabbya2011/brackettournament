@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const graphql = require('graphql');
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 
-const CompetitorType = require('./competitor_type');
+const { CompetitorType } = require('./competitor_type');
 const Competitor = mongoose.model('competitor');
 
 const RootQuery = new GraphQLObjectType({

@@ -13,27 +13,45 @@ class TournamentTree extends Component{
     }
     
     getNewCompetitor(updatedRound,columnIndex,itemIndex){
+        
         let newItemIndex = Math.floor(itemIndex/2);
-        const newColumnIndex = columnIndex++;
-        newItemIndex = newItemIndex%2?newItemIndex--:newItemIndex++;
-        const newCompetitor = this.tournamentList[newColumnIndex][newItemIndex];
-        return newCompetitor?newCompetitor.id:'';
+        
+        const newColumnIndex = columnIndex+1;
+        
+        newItemIndex = newItemIndex%2?newItemIndex-1:newItemIndex+1;
+        
+        if(this.tournamentList[newColumnIndex]){
+            const newCompetitor = this.tournamentList[newColumnIndex][newItemIndex];
+        
+            return newCompetitor?newCompetitor.id:'';
+        }else{
+            return '';
+        }
+        
     }
 
 
-    makeCommonOnClickChanges(roundChangeBody,statusChangeBody,competeAgainstBody){
+    makeCommonOnClickChanges(roundChangeBody,statusChangeBody,competeAgainstBody,updateOldCompetitor={newCompetitor:''}){
+        let promiseArray = [
+            this.props.changeCompetitorRound({
+                variables:roundChangeBody
+            }),
+            this.props.changeCompetitorStatus({
+                variables:statusChangeBody
+            }),
+            this.props.changeCompeteAgainst({
+                variables:competeAgainstBody
+            })
+        ];
+        if(updateOldCompetitor.newCompetitor!=''){
+            promiseArray.push(
+                this.props.changeCompeteAgainst({
+                    variables:updateOldCompetitor.variables
+                })
+            );
+        }
         return Promise
-            .all([
-                    this.props.changeCompetitorRound({
-                        variables:roundChangeBody
-                    }),
-                    this.props.changeCompetitorStatus({
-                        variables:statusChangeBody
-                    }),
-                    this.props.changeCompeteAgainst({
-                        variables:competeAgainstBody
-                    })
-                ]);
+            .all(promiseArray);
     }
 
     revertBackAlreadyModifiedCompetitor(data,competeAgainstInfo){
@@ -54,15 +72,21 @@ class TournamentTree extends Component{
     }
 
     competitorClicked(data,columnIndex,itemIndex){
-        console.log(this.props);
         let updatedRound = Number(data.round);
         updatedRound++;
-        const competeAgainstInfo = this.tournamentList[data.round].find(competitor=>competitor.id==data.competeAgainst);
+        const competeAgainstInfo = this.tournamentList[data.round].find(competitor=>{
+            if(competitor)
+            return competitor.id==data.competeAgainst
+        });
+        
         const newCompetitor = this.getNewCompetitor(updatedRound,columnIndex,itemIndex);
-        if(data.competeAgainst=="" || (competeAgainstInfo.competeAgainst !=data.competeAgainst && competeAgainstInfo.round>(1+data.round))
-            ||((competeAgainstInfo.round-data.round==1)&&(competeAgainstInfo.competeAgainst!=""))){
+        
+        if(data.competeAgainst=="" || ((Math.abs(competeAgainstInfo.round-data.round)==1)&&(competeAgainstInfo.competeAgainst!=""))
+            || (Math.abs(competeAgainstInfo.round-data.round)>1) || (columnIndex<data.round)){
             return;
         }
+
+
         this.makeCommonOnClickChanges(
             {
                 id:data.id,
@@ -75,18 +99,15 @@ class TournamentTree extends Component{
             {
                 id:data.id,
                 competeAgainst:newCompetitor
+            },
+            {
+                newCompetitor,
+                variables:{
+                    id:newCompetitor,
+                    competeAgainst:data.id
+                }
             }
         )
-        .then(()=>{
-            if(newCompetitor!=''){
-                this.props.changeCompeteAgainst({
-                    variables:{
-                        id:newCompetitor,
-                        competeAgainst:data.id
-                    }
-                })
-            }
-        })
         .then((res)=>{
             if(data.active==false){
                 this.revertBackAlreadyModifiedCompetitor(data,competeAgainstInfo)
@@ -159,7 +180,7 @@ class TournamentTree extends Component{
     }
     renderTournamentList(){
         const tournamentList = this.populateBracketList(this.props.data.competitors);
-        console.log(tournamentList);
+        
         this.tournamentList = tournamentList;
         
         return tournamentList.map((list,columnIndex)=>{
@@ -172,6 +193,46 @@ class TournamentTree extends Component{
             return <div className="column" style={this.getTotalHeight(tournamentList[0])} key={columnIndex}>{columns}</div>
         })
     }
+
+    createDefaultObjectBody(competitor,competeAgainstId){
+        return {
+            id:competitor.id,
+            name:competitor.name,
+            competeAgainst:competeAgainstId,
+            round : 0,
+            active : true,
+            primaryIndex:competitor.primaryIndex
+        }
+    }
+    
+    resetTournament(){
+        const resetUsers = [];
+        this.tournamentList[0].forEach((item)=>{
+            if(item.round!=0){
+                return;
+            }
+            if(this.checkDuplicateCompetitor(item.id,resetUsers)){
+                return;
+            }
+            
+            let resetCompetitor = this.createDefaultObjectBody(item,item.competeAgainst);
+            
+            const competeAgainstId = resetCompetitor.competeAgainst;
+            let competeAgainstCompetitor = this.createDefaultObjectBody(this.props.data.competitors.find(item=>item.id==competeAgainstId),resetCompetitor.id);
+            resetUsers.push(resetCompetitor);
+            resetUsers.push(competeAgainstCompetitor);
+        });
+        const param = {
+            "competitors": resetUsers
+        };
+        this.props.resetTournament({
+            variables:param
+        }).then(
+            ()=>{
+                this.rerenderUIComponents();
+            }
+        )
+     }
     render(){
         if(this.props.data.loading){
             return <div>Loading ... </div>;
@@ -200,20 +261,11 @@ const queryToGetCompleteTournamentData = gql`
     }
 }`;
 
-// const changeCompetitorDetails = gql`
-
-//     input AvatarOptions {
-//         name: String
-//         competeAgainst: String,
-//         round : Int,
-//         active : Boolean
-//     }
-//     mutation changeCompetitorDetails ($id : ID, $competitor : AvatarOptions){
-//         changeCompetitorDetails(id: $id, competitor: $competitor){
-//             round
-//         }
-//     }
-// `;
+const resetTournament = gql`
+    mutation resetCompetition ($competitors : [CompetitorInputType]){
+        resetCompetition(competitors: $competitors)
+    }
+`;
 
 const changeCompetitorRound = gql`
     mutation changeCompetitorRound ($id : ID, $round :Int){
@@ -246,9 +298,9 @@ const changeCompeteAgainst = gql`
 
 const TournamentQueryAndMutationCollection =  compose(
     graphql(queryToGetCompleteTournamentData),
-    // graphql(changeCompetitorDetails, {
-    //     name : 'changeCompetitorDetails'
-    // }),
+    graphql(resetTournament, {
+        name : 'resetTournament'
+    }),
     graphql(changeCompetitorRound, {
         name : 'changeCompetitorRound'
     }),

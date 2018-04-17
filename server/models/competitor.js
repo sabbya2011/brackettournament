@@ -63,6 +63,17 @@ CompetitorSchema.statics.changeCompeteAgainst = function(id, competeAgainst) {
     });
 }
 
+CompetitorSchema.statics.resetCompetition = function(competitors) {
+  var bulk = this.collection.initializeUnorderedBulkOp();
+  
+  competitors.forEach(element => {
+    bulk
+      .find({'_id': mongoose.Types.ObjectId(element.id)}).updateOne( { $set: { round:element.round, active:true,competeAgainst:element.competeAgainst } } );
+  });
+  
+  return bulk.execute();
+}
+
 
 
 mongoose.model('competitor', CompetitorSchema);
