@@ -12,3 +12,6 @@ To change the name of any competitor select the edit button at down below to go 
 
 To modify a name , simply change it and on blur event the change name request will be triggered.
 (As of now no validation is there on Username and even if one don't modify the user name and still comes out of the input area, the request will still be triggered.)
+
+To see working copy please visit
+https://peaceful-ocean-35358.herokuapp.com/#/
