@@ -1,4 +1,6 @@
 TournamentBracket Project is created to display a knockout tournament progress.
+    Application frontend is built with React, and backend with Node.
+    GraphQL is used to perform Query on the database built with MongoDB. 
 
 Once a node is clicked it will progress to the next round.
 
