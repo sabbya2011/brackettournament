@@ -1,0 +1,15 @@
+.column{
+    display: inline-block;
+    width: 100px;
+    position: relative;
+    margin: 0 20px;
+}
+.column-item{
+    height: 30px;
+    width: 100%;
+    line-height: 30px;
+    border: 1px solid #000000;
+    position: absolute;
+    text-align: center;
+    cursor: pointer;
+}
