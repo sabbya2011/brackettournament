@@ -7,14 +7,19 @@
     "type": "git",
     "url": "https://github.com/sabbya2011/brackettournament.git"
   },
+  "engines":{
+    "node":"8.11.0",
+    "npm":"5.7.1"
+  },
   "scripts": {
-    "dev": "nodemon index.js --ignore client"
+    "dev": "nodemon index.js --ignore client",
+    "start":"node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-client": "^0.8.7",
     "axios": "^0.15.3",
+    "apollo-client": "^0.8.7",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-preset-env": "^1.1.8",
