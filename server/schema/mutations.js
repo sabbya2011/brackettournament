@@ -77,7 +77,6 @@ const mutation = new GraphQLObjectType({
         competitors: { type: new GraphQLList(InputCompetitorType) }
       },
       resolve(parentValue, { competitors }) {
-        console.log(competitors);
         return Competitor.resetCompetition(competitors);
       }
     },

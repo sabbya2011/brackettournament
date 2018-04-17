@@ -238,10 +238,10 @@ class TournamentTree extends Component{
         return( 
             <div>
                 <div className="collection">{this.renderTournamentList()}</div>
-                {/* <Link to="song/new" className="btn-floating btn-large red right">
-                    <i className="material-icons">add</i>
-                </Link> */}
-                <button onClick={(e)=>{this.resetTournament()}}>Reset Tournament</button>
+                <button onClick={(e)=>{this.resetTournament()}} className="waves-effect waves-light btn">Reset Tournament</button>
+                <Link to="competitorList" className="btn-floating btn-large red right">
+                    <i className="material-icons">edit</i>
+                </Link>
             </div>
         )
     }
