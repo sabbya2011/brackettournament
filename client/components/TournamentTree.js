@@ -59,7 +59,8 @@ class TournamentTree extends Component{
         updatedRound++;
         const competeAgainstInfo = this.tournamentList[data.round].find(competitor=>competitor.id==data.competeAgainst);
         const newCompetitor = this.getNewCompetitor(updatedRound,columnIndex,itemIndex);
-        if(data.competeAgainst=="" || columnIndex != data.round){
+        if(data.competeAgainst=="" || (competeAgainstInfo.competeAgainst !=data.competeAgainst && competeAgainstInfo.round>(1+data.round))
+            ||((competeAgainstInfo.round-data.round==1)&&(competeAgainstInfo.competeAgainst!=""))){
             return;
         }
         this.makeCommonOnClickChanges(
@@ -181,7 +182,7 @@ class TournamentTree extends Component{
                 {/* <Link to="song/new" className="btn-floating btn-large red right">
                     <i className="material-icons">add</i>
                 </Link> */}
-                <button onCick={(e)=>{this.resetTournament()}}>Reset Tournament</button>
+                <button onClick={(e)=>{this.resetTournament()}}>Reset Tournament</button>
             </div>
         )
     }
